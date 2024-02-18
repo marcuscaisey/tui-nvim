@@ -17,14 +17,30 @@ local defaults = {
 }
 
 local function dimensions(opts)
+  local status_height = 0
+	if
+		(vim.o.laststatus == 1 and #vim.api.nvim_tabpage_list_wins(0) > 1)
+		or vim.o.laststatus == 2
+		or vim.o.laststatus == 3
+	then
+		status_height = 1
+	end
+  local tabline_height = 0
+  if
+    (vim.o.showtabline == 1 and #vim.api.nvim_list_tabpages() > 1)
+    or vim.o.showtabline == 2
+  then
+    tabline_height = 1
+  end
+
   local cl = vim.o.columns
-  local ln = vim.o.lines
+  local ln = vim.o.lines - vim.o.cmdheight - status_height - tabline_height
 
   local width = math.ceil(cl * opts.width)
-  local height = math.ceil(ln * opts.height - 4)
+  local height = math.ceil(ln * opts.height)
 
   local col = math.ceil((cl - width) * opts.x)
-  local row = math.ceil((ln - height) * opts.y - 1)
+  local row = tabline_height + math.ceil((ln - height) * opts.y)
 
   return {
     width = width,
